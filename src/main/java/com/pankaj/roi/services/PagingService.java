@@ -1,26 +1,37 @@
 package com.pankaj.roi.services;
 
-import com.pankaj.roi.models.PagingRequest;
-import org.springframework.stereotype.Component;
-
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.pankaj.roi.models.FBPhotos;
+import com.pankaj.roi.models.PagingRequest;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class PagingService {
 
-    private BlockingQueue<PagingRequest> queue = new ArrayBlockingQueue<>(1000);
+	@Autowired
+	private APIClient apiClient;
 
-    public void addPagingRequest(PagingRequest<?> request) throws InterruptedException {
-        queue.put(request);
-    }
+	@Autowired
+	private UserService service;
 
-    private void processPagingRequest() throws InterruptedException {
-        while(true) {
-            if(!queue.isEmpty()) {
-                PagingRequest<?> request = queue.take();
-//                request.getClass().equals()
-            }
-        }
-    }
+//	public void processPagingRequest(PagingRequest<?> request) throws InterruptedException {
+//		CompletableFuture.runAsync(() -> {
+//			try {
+//				if (request.getClazz() == FBPhotos.class) {
+//					FBPhotos userPhotoDetails = apiClient.getNextPage((PagingRequest<FBPhotos>) request);
+//					service.loadUserPhotos(request.getPersistedUser(), userPhotoDetails);
+//				}
+//			} catch(Exception e) {
+//				LOG.error("Error occured while asking for next page {} ", e);
+//			}
+//		});
+//	}
 }

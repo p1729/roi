@@ -8,4 +8,5 @@ public class FBPhotoData {
     private String link;
     private String picture;
     private Album album;
+    private ReactionsData reactions;
 }

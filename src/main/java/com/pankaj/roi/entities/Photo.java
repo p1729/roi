@@ -43,7 +43,7 @@ public class Photo {
     private User user;
 
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PhotoReaction> photoReactions;
+    private List<PhotoReaction> photoReactions = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
@@ -63,19 +63,28 @@ public class Photo {
         reaction.setPhoto(this);
     }
 
+    public void addReactions(List<PhotoReaction> reactions) {
+        photoReactions.addAll(reactions);
+        reactions.forEach(reaction -> reaction.setPhoto(this));
+    }
+
     public void removeReaction(PhotoReaction reaction) {
         photoReactions.remove(reaction);
         reaction.setPhoto(null);
     }
 
-    private static Photo of(FBPhotoData data, User user) {
-        return Photo.builder()
+    public static Photo of(FBPhotoData data, User user) {
+        Photo photo = Photo.builder()
                 .fbId(data.getId())
                 .fbLink(data.getLink())
                 .imageLink(data.getPicture())
                 .album(PhotoAlbum.of(data.getAlbum()))
                 .user(user)
                 .build();
+
+        if(Objects.nonNull(data.getReactions()))
+            photo.addReactions(PhotoReaction.of(data.getReactions()));
+        return photo;
     }
 
     public static List<Photo> of(FBPhotos fbPhotos, User user) {

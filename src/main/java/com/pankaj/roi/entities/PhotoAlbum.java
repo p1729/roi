@@ -42,18 +42,7 @@ public class PhotoAlbum {
         photo.setAlbum(null);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PhotoAlbum that = (PhotoAlbum) o;
-        return id == that.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    
 
     public static PhotoAlbum of(Album a) {
         return Objects.isNull(a) ? null : PhotoAlbum.builder()
@@ -71,4 +60,17 @@ public class PhotoAlbum {
                 .filter(photoAlbum -> !Objects.isNull(photoAlbum))
                 .collect(Collectors.toList());
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		PhotoAlbum that = (PhotoAlbum) o;
+		return fbId.equals(that.fbId);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(fbId);
+	}
 }

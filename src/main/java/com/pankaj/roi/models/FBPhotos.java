@@ -1,10 +1,13 @@
 package com.pankaj.roi.models;
 
+import com.pankaj.roi.entities.Photo;
 import lombok.Data;
+import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Data
 public class FBPhotos {
@@ -15,4 +18,6 @@ public class FBPhotos {
         if(!Objects.isNull(data))
             this.data.addAll(data);
     }
+
+
 }

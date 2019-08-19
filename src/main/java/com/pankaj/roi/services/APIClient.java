@@ -1,12 +1,14 @@
 package com.pankaj.roi.services;
 
-import com.pankaj.roi.models.FBPhotos;
-import com.pankaj.roi.models.FBUserCredentials;
-import com.pankaj.roi.models.FBUser;
-import com.pankaj.roi.models.TokenPermissions;
+import com.pankaj.roi.models.*;
+
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
+
+import java.nio.charset.Charset;
 
 @Service
 public class APIClient {
@@ -23,8 +25,13 @@ public class APIClient {
     private static final String ACCESS_TOKEN = "access_token";
     public static final String LINK = "link";
     public static final String ALBUM = "album";
+    private static final String REACTIONS = "reactions";
 
     private final RestTemplate restTemplate = new RestTemplate();
+//    		Builder()
+//    		.errorHandler(new RestTemplateResponseErrorHandler())
+//            .build();
+    
 
     public TokenPermissions getTokenPermissions(FBUserCredentials cred) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(FB_GRAPH_API_URI)
@@ -47,9 +54,19 @@ public class APIClient {
     public FBPhotos getUserPhotoDetails(FBUserCredentials cred) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(FB_GRAPH_API_URI)
                 .pathSegment(cred.getFbId(),"photos")
-                .queryParam(FIELDS, String.join(",", LINK, ALBUM, PICTURE))
+                .queryParam(FIELDS, String.join(",", LINK, ALBUM, PICTURE, REACTIONS))
+                .queryParam("limit", "1")
+                .queryParam("type", "uploaded")
                 .queryParam(ACCESS_TOKEN, cred.getAccessToken());
 
         return restTemplate.getForObject(builder.toUriString(), FBPhotos.class);
+    }
+
+	public FBPhotos getNextPhotoPage(Paging request, Class<FBPhotos> clazz) {
+		return restTemplate.getForObject(UriUtils.decode(request.getNext(), "UTF-8"), clazz);
+	}
+
+    public ReactionsData getNextReactionPage(Paging request, Class<ReactionsData> clazz) {
+        return restTemplate.getForObject(UriUtils.decode(request.getNext(), "UTF-8"), clazz);
     }
 }
