@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ROI user-n-photos API</title>
+</head>
+<body>
+<h1 id="roiusernphotosapi">ROI user-n-photos API</h1>
+<p>Load facebook user's photo data and their reaction</p>
+<h2 id="designoverview">Design Overview</h2>
+<ol>
+    <li>DB Relations
+        <code>
+            User (Many) ---tag-- (Many) Photo
+            Photo (One) -----(One) Album
+            Photo (One) ------(Many) Reaction
+        </code>
+    </li>
+    <li>When user sends a load data request, that same request may spawn many calls to FB and can have huge data to load
+        which may take longer time to persist. So, we can the accept the request by checking token permission and trying
+        to load users basic data before loading the photos data in async. Also, send the Location header mentioning the
+        URL to get the loaded data. <code>TODO</code> We can also send the state using some 'Content-Location' header as
+        well
+    </li>
+    <li>We can relay the errors while accessing FB API in case of invalid access token, session expire, wrong fbid, and
+        in case of <code>TODO</code> errors like 503 we can retry
+    </li>
+    <li>Deletion will not delete the photo as photo may till every user tagged is removed, same is the case with photo
+        and album.
+    </li>
+</ol>
+
+<h3 id="todo">TODO</h3>
+
+<ol>
+    <li>HATEOS</li>
+    <li>Exception handling, retries and sorting as mentioned above</li>
+    <li>Tests</li>
+</ol>
+
+<h2 id="apidocumentation">API Documentation</h2>
+<blockquote>
+    <p>Try out these at <a href="https://p1729-roi.herokuapp.com/">https://p1729-roi.herokuapp.com/</a></p>
+</blockquote>
+<ol>
+    <li><p>Send request to load facebook user-n-photo data asynchronously</p>
+
+        <pre><code>POST /users
+{
+    "fbId": "user's facebook id (not username)"
+    "accessToken": "users's facebook access token with required permissions(email, user_photos, user_gender)"
+}
+    </code></pre>
+
+        <p>Sends API response <code>202</code> in case request is accepted and sends the resource location in <code>Location</code>
+            header, <code>400</code> in case wrong user id or lack of required permissions etc., <code>409</code> in
+            case of duplicate request</p>
+
+    </li>
+    <li>Fetch the loaded user's data
+
+        <pre><code>GET /users/{id}
+    </code></pre>
+
+        <p>Sends <code>200</code> with below model and <code>404</code> if not found</p>
+
+        <pre><code class="json language-json">{
+  "name": "string",
+  "gender": "string",
+  "email": "string",
+  "profile_pic_url": "string"
+}
+    </code></pre>
+
+    </li>
+    <li>Fetch user's photo data with reaction summary
+
+        <pre><code>GET /users/{id}/photos
+    </code></pre>
+
+        <p>Sends <code>200</code> with below model and <code>404</code> if not found</p>
+
+        <pre><code class="json language-json">{
+  "photos": [
+    {
+      "link": "string",
+      "fb_link": "string",
+      "album_name": "string",
+      "reactions": [
+        {
+          "type": "string",
+          "total_count": "string"
+        }
+      ]
+    }
+  ]
+}
+    </code></pre>
+
+    </li>
+    <li>Delete loaded user's data
+
+        <pre><code>DELETE /users/{id}</code></pre>
+        <p>Sends <code>200</code> or <code>404</code> if not found</p></li>
+</ol>
+
+<h2 id="technologystackdbandframeworksused">Technology Stack, DB and Frameworks used</h2>
+
+<p>Spring boot, Spring MVC, Maven, Java 8, Liquibase, Hibernate, Lombok, H2</p>
+</body>
+</html>

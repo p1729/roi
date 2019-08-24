@@ -36,7 +36,7 @@ public class UserController {
         try {
 
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Location", user.getFbId());
+            headers.set("Location", "/users/" + user.getFbId());
             userService.loadFBUser(user);
             return new ResponseEntity<>("", headers, HttpStatus.ACCEPTED);
         } catch(HttpClientErrorException e) {
