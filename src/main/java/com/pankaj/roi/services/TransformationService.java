@@ -71,14 +71,6 @@ public class TransformationService {
                         .build());
     }
 
-//    public Set<PhotoReaction> getSetOfReactionsFromPhotos(Set<Photo> photos) {
-//        return photos.stream().filter(Objects::nonNull)
-//                .filter(p -> Objects.nonNull(p.getPhotoReactions()))
-//                .filter(p -> !p.getPhotoReactions().isEmpty())
-//                .flatMap(p -> p.getPhotoReactions().stream())
-//                .collect(Collectors.toSet());
-//    }
-
     public Set<PhotoAlbum> getSetOfAlbumFromPhotos(Set<Photo> photos) {
         return photos.stream().filter(Objects::nonNull)
                 .map(Photo::getAlbum).filter(Objects::nonNull)
