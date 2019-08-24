@@ -1,16 +1,14 @@
 package com.pankaj.roi.entities;
 
-import com.pankaj.roi.models.Album;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Entity
 @Data
@@ -30,7 +28,7 @@ public class PhotoAlbum {
     private String name;
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
-    private List<Photo> photoList = new ArrayList<>();
+    private Set<Photo> photoList = new HashSet<>();
 
     public void addPhoto(Photo photo) {
         photoList.add(photo);
@@ -40,25 +38,6 @@ public class PhotoAlbum {
     public void removePhoto(Photo photo) {
         photoList.remove(photo);
         photo.setAlbum(null);
-    }
-
-    
-
-    public static PhotoAlbum of(Album a) {
-        return Objects.isNull(a) ? null : PhotoAlbum.builder()
-                .fbId(a.getId())
-                .name(a.getName())
-                .build();
-    }
-
-    public static List<PhotoAlbum> of(List<Photo> photos) {
-        return photos.stream()
-                .map(photo -> {
-                    if (Objects.isNull(photo)) return null;
-                    return photo.getAlbum();
-                })
-                .filter(photoAlbum -> !Objects.isNull(photoAlbum))
-                .collect(Collectors.toList());
     }
 
 	@Override

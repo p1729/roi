@@ -5,10 +5,7 @@ import com.pankaj.roi.models.FBUser;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Data
@@ -42,21 +39,16 @@ public class User {
     @Column(name = "profile_pic_url")
     private String profilePicURL;
 
-    @OneToMany(
-        mappedBy = "user",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
+    @Setter(AccessLevel.NONE)
+    @ToString.Exclude
+    @ManyToMany(
+            mappedBy = "users"
     )
-    private List<Photo> photoList = new ArrayList<>();
+    private Set<Photo> photos = new HashSet<>();
 
     @PrePersist
     public void perPersist() {
         createdOn = new Date();
-    }
-
-    public void addPhoto(Photo photo) {
-        photoList.add(photo);
-        photo.setUser(this);
     }
 
     @Override
@@ -64,17 +56,12 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id;
+        return fbId.equals(user.fbId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    public void removePhoto(Photo photo) {
-        photoList.remove(photo);
-        photo.setUser(null);
+        return Objects.hash(fbId);
     }
 
     public static User of(FBUser fbUser) {
@@ -83,6 +70,7 @@ public class User {
                 .email(fbUser.getEmail())
                 .gender(Gender.valueOf(fbUser.getGender().toUpperCase()))
                 .name(fbUser.getName())
+                .photos(new HashSet<>())
                 .profilePicURL(fbUser.getPicture().getData().getUrl())
                 .build();
     }

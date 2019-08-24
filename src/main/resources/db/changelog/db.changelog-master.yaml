@@ -102,14 +102,6 @@ databaseChangeLog:
                     foreignKeyName: fk_photos_album
                     referencedTableName: photo_album
                     referencedColumnNames: id
-              - column:
-                  name: user_id
-                  type: java.sql.Types.INTEGER
-                  constraints:
-                    foreignKeyName: fk_photos_user
-                    referencedTableName: user
-                    referencedColumnNames: id
-                    deleteCascade: true
         - createTable:
             tableName: photo_reaction
             columns:
@@ -139,3 +131,24 @@ databaseChangeLog:
                     referencedTableName: photos
                     referencedColumnNames: id
                     deleteCascade: true
+        - createTable:
+            tableName: user_tag_photo
+            columns:
+              - column:
+                  name: photo_id
+                  type: java.sql.Types.INTEGER
+                  constraints:
+                    foreignKeyName: fk_user_tag_photo_photo
+                    referencedTableName: photos
+                    referencedColumnNames: id
+              - column:
+                  name: user_id
+                  type: java.sql.Types.INTEGER
+                  constraints:
+                    foreignKeyName: fk_user_tag_photo_user
+                    referencedTableName: user
+                    referencedColumnNames: id
+        - addUniqueConstraint:
+            columnNames: photo_id, user_id
+            constraintName: uk_user_tag_photo
+            tableName: user_tag_photo

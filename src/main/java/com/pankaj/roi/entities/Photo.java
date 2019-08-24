@@ -1,17 +1,11 @@
 package com.pankaj.roi.entities;
 
-import com.pankaj.roi.models.FBPhotoData;
-import com.pankaj.roi.models.FBPhotos;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Entity
 @Data
@@ -34,28 +28,47 @@ public class Photo {
     @Column(name = "image_link")
     private String imageLink;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
     private PhotoAlbum album;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ToString.Exclude
+    @ManyToMany(
+            cascade = {CascadeType.MERGE}
+    )
+    @JoinTable(
+            name= "user_tag_photo",
+            joinColumns = @JoinColumn(name= "photo_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> users = new HashSet<>();
 
+    @ToString.Exclude
+    @Setter(AccessLevel.NONE)
     @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PhotoReaction> photoReactions = new ArrayList<>();
+    private Set<PhotoReaction> photoReactions = new HashSet<>();
+
+    public void addUser(User user) {
+        users.add(user);
+        user.getPhotos().add(this);
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Photo photo = (Photo) o;
-        return id == photo.id;
+        return fbId.equals(photo.fbId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(fbId);
+    }
+
+    public void setPhotoReactions(Set<PhotoReaction> reactions) {
+        if(Objects.nonNull(reactions)) photoReactions.addAll(reactions);
     }
 
     public void addReaction(PhotoReaction reaction) {
@@ -63,7 +76,7 @@ public class Photo {
         reaction.setPhoto(this);
     }
 
-    public void addReactions(List<PhotoReaction> reactions) {
+    public void addReactions(Set<PhotoReaction> reactions) {
         photoReactions.addAll(reactions);
         reactions.forEach(reaction -> reaction.setPhoto(this));
     }
@@ -73,21 +86,8 @@ public class Photo {
         reaction.setPhoto(null);
     }
 
-    public static Photo of(FBPhotoData data, User user) {
-        Photo photo = Photo.builder()
-                .fbId(data.getId())
-                .fbLink(data.getLink())
-                .imageLink(data.getPicture())
-                .album(PhotoAlbum.of(data.getAlbum()))
-                .user(user)
-                .build();
-
-        if(Objects.nonNull(data.getReactions()))
-            photo.addReactions(PhotoReaction.of(data.getReactions()));
-        return photo;
-    }
-
-    public static List<Photo> of(FBPhotos fbPhotos, User user) {
-        return fbPhotos.getData().stream().map(d -> Photo.of(d, user)).collect(Collectors.toList());
+    public void removeUser(User user) {
+        users.remove(user);
+        user.getPhotos().remove(this);
     }
 }
