@@ -26,10 +26,6 @@ public class FBAPIClient {
     private static final String ALBUM = "album";
     private static final String REACTIONS = "reactions";
     private static final String ACCESS_TOKEN = "access_token";
-    private static final String LIMIT = "limit";
-    private static final String TYPE = "type";
-    private static final String UPLOADED = "uploaded";
-    private static final String ONE = "1";
 
 
     private RestTemplate restTemplate = new RestTemplate();

@@ -2,9 +2,7 @@ package com.pankaj.roi.models;
 
 import com.pankaj.roi.entities.Photo;
 import com.pankaj.roi.entities.User;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 public class PagingRequest<T extends FBPhotos> extends Paging {

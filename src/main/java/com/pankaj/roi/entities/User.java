@@ -5,7 +5,10 @@ import com.pankaj.roi.models.FBUser;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Data

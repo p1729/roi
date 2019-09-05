@@ -48,7 +48,7 @@ public class PhotoService {
     private void loadNextPageOfPhotos(User user, FBPhotos userPhotoDetails) {
         try {
             if (Objects.nonNull(userPhotoDetails.getPaging()) && isNextPageAvailable(userPhotoDetails.getPaging()))
-                loadNextPage(userPhotoDetails.getPaging(), FBPhotos.class, (apiData) -> loadUserPhotos(user, apiData));
+                loadNextPage(userPhotoDetails.getPaging(), FBPhotos.class, apiData -> loadUserPhotos(user, apiData));
         } catch (Exception e) {
             LOG.error("Error occurred while loading next page of photos for user id {} {} {}", user.getFbId(),
                     user.getName(), e);
@@ -58,7 +58,7 @@ public class PhotoService {
     private void loadNextPageOfPhotosReactions(Photo photo, ReactionsData data) {
         try {
             if (Objects.nonNull(data.getPaging()) && isNextPageAvailable(data.getPaging()))
-                loadNextPage(data.getPaging(), ReactionsData.class, (apiData) -> loadNextPageOfPhotosReactions(photo, apiData));
+                loadNextPage(data.getPaging(), ReactionsData.class, apiData -> loadNextPageOfPhotosReactions(photo, apiData));
         } catch (Exception e) {
             LOG.error("Error occurred while loading next page of reactions for photo id {} {}", photo.getFbId(), e);
         }
@@ -140,7 +140,7 @@ public class PhotoService {
         photos.forEach(photo -> {
             photo.removeUser(user);
             //check if photos can be removed
-            if(photo.getUsers().size() == 0) {
+            if(photo.getUsers().isEmpty()) {
                 //photo can be deleted
                 //check if albums can be removed
                 if(photo.getAlbum().getPhotoList().size() == 1) {
@@ -150,7 +150,7 @@ public class PhotoService {
                 }
                 Set<PhotoReaction> reactions = new HashSet<>() ;
                 reactions.addAll(photo.getPhotoReactions());
-                reactions.forEach(r -> photo.removeReaction(r));
+                reactions.forEach(photo::removeReaction);
                 photoRepository.delete(photo);
             }
         });

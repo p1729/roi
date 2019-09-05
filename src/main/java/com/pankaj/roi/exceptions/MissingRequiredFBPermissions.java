@@ -1,11 +1,10 @@
 package com.pankaj.roi.exceptions;
 
-import java.util.EnumSet;
-
+import com.pankaj.roi.enums.FBPermissions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.pankaj.roi.enums.FBPermissions;
+import java.util.Set;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class MissingRequiredFBPermissions extends Exception {
@@ -13,7 +12,7 @@ public class MissingRequiredFBPermissions extends Exception {
 	public MissingRequiredFBPermissions() {
 	}
 
-	public MissingRequiredFBPermissions(EnumSet<FBPermissions> requiredPermissions) {
+	public MissingRequiredFBPermissions(Set<FBPermissions> requiredPermissions) {
 		super("Need all of the required permission" + requiredPermissions.toString());
 	}
 	

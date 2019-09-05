@@ -17,11 +17,11 @@ import javax.transaction.Transactional;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import static com.pankaj.roi.enums.FBPermissions.*;
 import static com.pankaj.roi.utils.LambdaUtils.expValIfExpWrapper;
-import static com.pankaj.roi.validators.NotNullValidators.validateNotNull;
 
 @Slf4j
 @Service
@@ -43,12 +43,12 @@ public class UserService {
     private static final String ACCESS_GRANTED = "granted";
 
     public void validateAccessTokenPermissions(final FBUserCredentials cred,
-                                               final EnumSet<FBPermissions> requiredPermissions) throws MissingRequiredFBPermissions {
+                                               final Set<FBPermissions> requiredPermissions) throws MissingRequiredFBPermissions {
         TokenPermissions tokenPermissions = apiClient.getTokenPermissions(cred);
 
-        validateNotNull(tokenPermissions, "tokenPermission");
-        validateNotNull(tokenPermissions.getPermissions(), "tokenPermission.permissions");
-        validateNotNull(tokenPermissions.getPermissions().getData(), "tokenPermission.permissions.data");
+        Objects.requireNonNull(tokenPermissions, "tokenPermission");
+        Objects.requireNonNull(tokenPermissions.getPermissions(), "tokenPermission.permissions");
+        Objects.requireNonNull(tokenPermissions.getPermissions().getData(), "tokenPermission.permissions.data");
 
         long requiredTokenPermissionCount = tokenPermissions.getPermissions().getData().stream()
                 .filter(p -> ACCESS_GRANTED.equals(p.getStatus()))
@@ -59,13 +59,13 @@ public class UserService {
             throw new MissingRequiredFBPermissions(requiredPermissions);
     }
 
-    public EnumSet<FBPermissions> getAllFBPermissionsForLoadingUserNPhotosDetails() {
+    public Set<FBPermissions> getAllFBPermissionsForLoadingUserNPhotosDetails() {
         return EnumSet.of(PUBLIC_PROFILE, EMAIL, USER_PHOTOS, USER_GENDER);
     }
 
     public void loadFBUser(FBUserCredentials cred) throws UserAlreadyPresent, MissingRequiredFBPermissions {
 
-        EnumSet<FBPermissions> requiredPermissions = getAllFBPermissionsForLoadingUserNPhotosDetails();
+        Set<FBPermissions> requiredPermissions = getAllFBPermissionsForLoadingUserNPhotosDetails();
         validateAccessTokenPermissions(cred, requiredPermissions);
 
         if (getUserByFbId(cred.getFbId()).isPresent()) throw new UserAlreadyPresent("User already present");
